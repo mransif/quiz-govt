@@ -22,7 +22,7 @@ export async function POST(request) {
     };
     
     // Add participant to database
-    const result = addParticipant(participant);
+    const result = await addParticipant(participant);
     
     if (result.success) {
       return NextResponse.json({ success: true });
