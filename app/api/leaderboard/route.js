@@ -4,7 +4,7 @@ import { getLeaderboard } from '@/lib/db';
 export async function GET() {
   try {
     // Get sorted leaderboard data
-    const leaderboard = getLeaderboard();
+    const leaderboard = await getLeaderboard();
     
     return NextResponse.json(leaderboard);
   } catch (error) {

@@ -9,19 +9,24 @@ export default function LeaderboardPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-
     // Fetch leaderboard data
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('/api/leaderboard');
-
+        const response = await fetch('/api/leaderboard', {
+          // Prevent caching to ensure fresh data
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
         if (!response.ok) {
           throw new Error('Failed to fetch leaderboard data');
         }
-
+        
         const data = await response.json();
-
-        // Sort participants by score (descending)
+        
+        // Data should already be sorted by the API, but sorting again just to be sure
         const sortedParticipants = data.sort((a, b) => b.score - a.score);
         setParticipants(sortedParticipants);
       } catch (err) {
@@ -31,86 +36,78 @@ export default function LeaderboardPage() {
         setLoading(false);
       }
     };
-
+    
     fetchLeaderboard();
   }, []);
 
   return (
-    <main className="min-h-screen w-screen overflow-hidden bg-gradient-to-br from-blue-400 via-cyan-600 to-blue-900 p-4 md:p-8"> {/* Full screen bg, water gradient, padding */}
-      <div className="w-full max-w-6xl mx-auto"> {/* Increased max-width to take up more space */}
-        <div className="bg-white bg-opacity-20 backdrop-blur-md rounded-xl shadow-lg p-6 md:p-8 mb-6 border border-white border-opacity-30"> {/* Frosted glass effect */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 md:mb-0">Deep Dive Leaderboard</h1> {/* Darker text, adjusted size */}
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 p-4">
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-blue-600">Leaderboard</h1>
             <Link
               href="/"
-              className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors font-semibold" // Darker blue button, themed focus ring
+              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >
-              Back to Shore (Home)
+              Back to Home
             </Link>
           </div>
-
+          
           {loading && (
             <div className="flex justify-center py-8">
-              {/* Adjusted spinner color */}
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-teal-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           )}
-
+          
           {error && (
-
-            <div className="text-center py-8 text-red-600">
+            <div className="text-center py-8 text-red-500">
               {error}
             </div>
           )}
-
+          
           {!loading && !error && participants.length === 0 && (
-
-            <div className="text-center py-8 text-gray-700">
-              No quiz participants yet. Dive in to be the first!
+            <div className="text-center py-8 text-gray-500">
+              No quiz participants yet.
             </div>
           )}
-
+          
           {!loading && !error && participants.length > 0 && (
-            <div className="overflow-x-auto"> 
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-blue-100 bg-opacity-30"> 
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                   
-                    <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-blue-800 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Rank
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-blue-800 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Name
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-blue-800 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Phone
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-blue-800 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Score
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200"> 
+                <tbody className="bg-white divide-y divide-gray-200">
                   {participants.map((participant, index) => (
-                    <tr
-                      key={index}
-                      className={index === 0 ? 'bg-teal-200 bg-opacity-40 text-gray-900 font-bold' : 'text-gray-800'} // Highlight first place with light teal and bolder darker text, others dark gray text
-                    >
-                      {/* Darker text for table data */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {index + 1}
-                        {index === 0 && ' 🏆'} {/* Keep trophy */}
+                    <tr key={index} className={index === 0 ? 'bg-yellow-50' : ''}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {index + 1}
+                          {index === 0 && ' 🏆'}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {participant.name}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{participant.name}</div>
                       </td>
-                      {/* Darker text for phone */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {participant.phone}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{participant.phone}</div>
                       </td>
-                      {/* Darker, bolder text for score */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                        {participant.score} / 10
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-gray-900">{participant.score} / 10</div>
                       </td>
                     </tr>
                   ))}
